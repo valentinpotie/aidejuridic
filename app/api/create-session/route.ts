@@ -1,12 +1,12 @@
 // aidejuridic-forgemini/app/api/create-session/route.ts
-import { type CookieOptions, createServerClient } from '@supabase/ssr'; // Utilisation de @supabase/ssr
+import { type CookieOptions, createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
-import { WORKFLOW_ID } from "@/lib/config"; //
+import { WORKFLOW_ID } from "@/lib/config"; // Assurez-vous que ce chemin est correct
 
-export const runtime = "edge"; // Runtime edge conservé
+export const runtime = "edge";
 
-interface CreateSessionRequestBody { //
+interface CreateSessionRequestBody {
   workflow?: { id?: string | null } | null;
   workflowId?: string | null;
   chatkit_configuration?: {
@@ -16,11 +16,10 @@ interface CreateSessionRequestBody { //
   };
 }
 
-const DEFAULT_CHATKIT_BASE = "https://api.openai.com"; //
+const DEFAULT_CHATKIT_BASE = "https://api.openai.com";
 
 export async function POST(request: Request): Promise<Response> {
-  // Correction clé pour Next.js 15 : `cookies()` est maintenant asynchrone
-  const cookieStore = await cookies();
+  const cookieStore = cookies();
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -40,12 +39,15 @@ export async function POST(request: Request): Promise<Response> {
     }
   );
 
+  // Utilisation de getSession pour l'instant, mais getUser() est recommandé pour la sécurité
   const { data: { session }, error: sessionError } = await supabase.auth.getSession();
 
   if (sessionError || !session) {
     console.error("Auth Error in create-session:", sessionError?.message || "No active session");
     return NextResponse.json({ error: 'Unauthorized - No active session' }, { status: 401 });
   }
+
+  const userId = session.user.id;
 
   try {
     const openaiApiKey = process.env.OPENAI_API_KEY;
@@ -59,7 +61,7 @@ export async function POST(request: Request): Promise<Response> {
 
     if (process.env.NODE_ENV !== "production") {
       console.info("[create-session] handling request for authenticated user", {
-        userId: session.user.id,
+        userId: userId,
         resolvedWorkflowId,
       });
     }
@@ -71,6 +73,15 @@ export async function POST(request: Request): Promise<Response> {
 
     const apiBase = process.env.CHATKIT_API_BASE ?? DEFAULT_CHATKIT_BASE;
     const url = `${apiBase}/v1/chatkit/sessions`;
+
+    const requestBodyToOpenAI = {
+      user: userId, // ID utilisateur ajouté
+      workflow: { id: resolvedWorkflowId },
+      chatkit_configuration: {
+        file_upload: { enabled: parsedBody?.chatkit_configuration?.file_upload?.enabled ?? true },
+      },
+    };
+
     const upstreamResponse = await fetch(url, {
       method: "POST",
       headers: {
@@ -78,17 +89,13 @@ export async function POST(request: Request): Promise<Response> {
         Authorization: `Bearer ${openaiApiKey}`,
         "OpenAI-Beta": "chatkit_beta=v1",
       },
-      body: JSON.stringify({
-        workflow: { id: resolvedWorkflowId },
-        chatkit_configuration: {
-          file_upload: { enabled: parsedBody?.chatkit_configuration?.file_upload?.enabled ?? true },
-        },
-      }),
+      body: JSON.stringify(requestBodyToOpenAI),
     });
 
     const upstreamJson = (await upstreamResponse.json().catch(() => ({}))) as Record<string, unknown> | undefined;
 
     if (!upstreamResponse.ok) {
+      // Utilisation de la nouvelle fonction extractUpstreamError
       const upstreamError = extractUpstreamError(upstreamJson);
       console.error("OpenAI ChatKit session creation failed", { status: upstreamResponse.status, statusText: upstreamResponse.statusText, body: upstreamJson });
       return NextResponse.json({ error: upstreamError ?? `Failed to create session: ${upstreamResponse.statusText}`, details: upstreamJson }, { status: upstreamResponse.status });
@@ -112,15 +119,50 @@ export async function POST(request: Request): Promise<Response> {
   }
 }
 
-// Handler GET (renvoie 405)
+// Handler GET (inchangé)
 export async function GET(): Promise<Response> {
     return NextResponse.json({ error: "Method Not Allowed" }, { status: 405, headers: { Allow: "POST" } });
 }
 
-// Helpers (inchangés)
+// Helper safeParseJson (inchangé)
 async function safeParseJson<T>(req: Request): Promise<T | null> {
     try { const text = await req.text(); return text ? (JSON.parse(text) as T) : null; } catch { return null; }
 }
-function extractUpstreamError(payload: Record<string, unknown> | undefined): string | null {
-    if (!payload) return null; const error = payload.error as any; if (typeof error === 'string') return error; if (typeof error?.message === 'string') return error.message; const details = payload.details as any; if (typeof details === 'string') return details; if (typeof details?.error === 'string') return details.error; if (typeof details?.error?.message === 'string') return details.error.message; if (typeof payload.message === 'string') return payload.message; return null;
+
+// --- Nouvelle fonction extractUpstreamError typée ---
+type WithMessage = { message?: unknown };
+type WithError = { error?: unknown };
+type WithDetails = { details?: unknown };
+
+function hasStringMessage(v: unknown): v is { message: string } {
+  return typeof v === 'object' && v !== null && typeof (v as WithMessage).message === 'string';
 }
+
+function extractUpstreamError(
+  payload: Record<string, unknown> | undefined
+): string | null {
+  if (!payload) return null;
+
+  // 1) error: string | { message?: string } | unknown
+  const errField: unknown = (payload as WithError).error;
+
+  if (typeof errField === 'string') return errField;
+  if (hasStringMessage(errField)) return errField.message;
+
+  // 2) details: string | { error?: string | { message?: string } } | unknown
+  const detailsField: unknown = (payload as WithDetails).details;
+
+  if (typeof detailsField === 'string') return detailsField;
+
+  if (typeof detailsField === 'object' && detailsField !== null) {
+    const nested = (detailsField as WithError).error;
+    if (typeof nested === 'string') return nested;
+    if (hasStringMessage(nested)) return nested.message;
+  }
+
+  // 3) message au top-level
+  if (typeof payload.message === 'string') return payload.message;
+
+  return null;
+}
+// ---------------------------------------------------
