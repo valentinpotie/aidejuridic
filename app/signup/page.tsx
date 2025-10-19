@@ -1,5 +1,8 @@
 import { GalleryVerticalEnd } from "lucide-react";
-import { SignUpForm } from "@/components/signup-form"; // import nommé, comme login
+import { Suspense } from "react";
+import { SignUpForm } from "@/components/signup-form";
+
+export const dynamic = "force-dynamic"; // empêche le prerender statique
 
 export default function SignUpPage() {
   return (
@@ -13,9 +16,13 @@ export default function SignUpPage() {
             Acme Inc.
           </a>
         </div>
+
         <div className="flex flex-1 items-center justify-center">
           <div className="w-full max-w-xs">
-            <SignUpForm />
+            {/* Suspense pour gérer les hooks client (useState, useRouter, etc.) */}
+            <Suspense fallback={null}>
+              <SignUpForm />
+            </Suspense>
           </div>
         </div>
       </div>

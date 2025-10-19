@@ -1,6 +1,9 @@
-import { GalleryVerticalEnd } from "lucide-react"
+import { GalleryVerticalEnd } from "lucide-react";
+import { Suspense } from "react";
+import { LoginForm } from "@/components/login-form";
 
-import { LoginForm } from "@/components/login-form"
+// (optionnel mais utile avec useSearchParams)
+export const dynamic = "force-dynamic";
 
 export default function LoginPage() {
   return (
@@ -16,7 +19,10 @@ export default function LoginPage() {
         </div>
         <div className="flex flex-1 items-center justify-center">
           <div className="w-full max-w-xs">
-            <LoginForm />
+            {/* ✅ Suspense autour du composant qui utilise useSearchParams */}
+            <Suspense fallback={null}>
+              <LoginForm />
+            </Suspense>
           </div>
         </div>
       </div>
@@ -28,5 +34,5 @@ export default function LoginPage() {
         />
       </div>
     </div>
-  )
+  );
 }
