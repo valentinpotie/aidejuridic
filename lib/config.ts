@@ -26,7 +26,7 @@ export type ThemeOption = {
 // IDs & endpoints
 export const WORKFLOW_ID = (process.env.NEXT_PUBLIC_CHATKIT_WORKFLOW_ID || "").trim();
 
-export const CREATE_SESSION_ENDPOINT = "/api/create-sessionn";
+export const CREATE_SESSION_ENDPOINT = "/api/create-session";
 
 // Prompts d’exemple
 export const STARTER_PROMPTS: StartScreenPrompt[] = [

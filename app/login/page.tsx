@@ -19,7 +19,7 @@ export default function LoginPage() {
         </div>
         <div className="flex flex-1 items-center justify-center">
           <div className="w-full max-w-xs">
-            {/* ✅ Suspense autour du composant qui utilise useSearchParams */}
+            {/* Suspense autour du composant qui utilise useSearchParams */}
             <Suspense fallback={null}>
               <LoginForm />
             </Suspense>
@@ -28,7 +28,7 @@ export default function LoginPage() {
       </div>
       <div className="bg-muted relative hidden lg:block">
         <img
-          src="/components/ui/imageloginsingup.png"
+          src="/images/imageloginsingup.png"
           alt="Image"
           className="absolute inset-0 h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
         />
