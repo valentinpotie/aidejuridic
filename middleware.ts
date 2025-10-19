@@ -1,3 +1,4 @@
+// aidejuridic/middleware.ts
 import { createServerClient, type CookieOptions } from '@supabase/ssr';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
@@ -31,10 +32,15 @@ export async function middleware(req: NextRequest) {
   );
 
   // Rafraîchit la session si elle a expiré (important)
-  const { data: { session } } = await supabase.auth.getSession();
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
 
-  const isAuthPage = req.nextUrl.pathname === '/login' || req.nextUrl.pathname === '/signup';
-  const isProtectedRoute = req.nextUrl.pathname.startsWith('/chat') || req.nextUrl.pathname === '/'; // Ajout de la racine comme route protégée
+  const isAuthPage =
+    req.nextUrl.pathname === '/login' || req.nextUrl.pathname === '/signup';
+  const isProtectedRoute =
+    req.nextUrl.pathname.startsWith('/chat') ||
+    req.nextUrl.pathname === '/'; // Ajout de la racine comme route protégée
 
   // Si l'utilisateur n'est pas connecté et essaie d'accéder à une page protégée
   if (!session && isProtectedRoute) {
@@ -47,9 +53,15 @@ export async function middleware(req: NextRequest) {
 
   // Si l'utilisateur est connecté et essaie d'accéder aux pages de login/signup
   if (session && isAuthPage) {
-    // Redirige vers la page de chat (ou la racine si vous préférez)
     const redirectUrl = req.nextUrl.clone();
-    redirectUrl.pathname = '/chat'; // Ou '/' si c'est la destination principale après connexion
+    redirectUrl.pathname = '/chat'; // Page principale après connexion
+    return NextResponse.redirect(redirectUrl);
+  }
+
+  // Si l'utilisateur est connecté et visite la racine "/", redirige vers /chat
+  if (session && req.nextUrl.pathname === '/') {
+    const redirectUrl = req.nextUrl.clone();
+    redirectUrl.pathname = '/chat';
     return NextResponse.redirect(redirectUrl);
   }
 
@@ -67,10 +79,5 @@ export const config = {
      * - favicon.ico (favicon file)
      */
     '/((?!api|_next/static|_next/image|favicon.ico).*)',
-    // Inclure explicitement les routes à gérer si le pattern ci-dessus est trop large
-    // '/',
-    // '/chat/:path*',
-    // '/login',
-    // '/signup',
   ],
 };

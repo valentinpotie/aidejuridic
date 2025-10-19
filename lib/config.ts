@@ -7,15 +7,20 @@ export const CREATE_SESSION_ENDPOINT = "/api/create-session";
 
 export const STARTER_PROMPTS: StartScreenPrompt[] = [
   {
-    label: "What can you do?",
-    prompt: "What can you do?",
+    label: "Quels arrêts traitent du défaut de base légale ?",
+    prompt: "Quels arrêts traitent du défaut de base légale ?",
+    icon: "circle-question",
+  },
+  {
+    label: "Trouve-moi les arrêts récents sur la rupture du contrat de travail",
+    prompt: "Trouve-moi les arrêts récents sur la rupture du contrat de travail",
     icon: "circle-question",
   },
 ];
 
-export const PLACEHOLDER_INPUT = "Ask anything...";
+export const PLACEHOLDER_INPUT = "Posez votre question juridique...";
 
-export const GREETING = "How can I help you today?";
+export const GREETING = "Recherchez dans la jurisprudence";
 
 export const getThemeConfig = (theme: ColorScheme): ThemeOption => ({
   color: {

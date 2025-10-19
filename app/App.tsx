@@ -1,3 +1,4 @@
+// aidejuridic/app/App.tsx
 "use client";
 
 import { useCallback } from "react";
@@ -19,9 +20,11 @@ export default function App() {
     }
   }, []);
 
+  // Removed the <main> tag as SidebarInset typically provides the main content area.
+  // Adjusted styling for better fit within SidebarInset.
   return (
-    <main className="flex min-h-screen flex-col items-center justify-end bg-slate-100 dark:bg-slate-950">
-      <div className="mx-auto w-full max-w-5xl">
+    <div className="flex h-full flex-col items-center justify-end bg-slate-100 dark:bg-slate-950 p-4"> {/* Added padding and ensure full height */}
+      <div className="mx-auto h-full w-full max-w-5xl"> {/* Ensure container takes full height */}
         <ChatKitPanel
           theme={scheme}
           onWidgetAction={handleWidgetAction}
@@ -29,6 +32,6 @@ export default function App() {
           onThemeRequest={setScheme}
         />
       </div>
-    </main>
+    </div>
   );
 }
