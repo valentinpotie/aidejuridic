@@ -64,9 +64,9 @@ export function LoginForm({
     >
       <FieldGroup>
         <div className="flex flex-col items-center gap-1 text-center">
-          <h1 className="text-2xl font-bold">Sign in to your account</h1>
+          <h1 className="text-2xl font-bold">Connectez-vous à votre compte</h1>
           <p className="text-muted-foreground text-sm text-balance">
-            Enter your email and password below to sign in
+            Entrez votre email et votre mot de passe ci-dessous pour vous connecter
           </p>
         </div>
         <Field>
@@ -74,7 +74,7 @@ export function LoginForm({
           <Input
             id="email"
             type="email"
-            placeholder="m@example.com"
+            placeholder="nom@exemple.com"
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
@@ -82,7 +82,7 @@ export function LoginForm({
           />
         </Field>
         <Field>
-          <Label htmlFor="password">Password</Label>
+          <Label htmlFor="password">Mot de passe</Label>
           <Input
             id="password"
             type="password"
@@ -94,27 +94,27 @@ export function LoginForm({
           {/* Optionnel: lien "Mot de passe oublié ?" */}
           {/* <FieldDescription className="text-right">
             <a href="#" className="underline underline-offset-4 text-sm">
-              Forgot password?
+              Mot de passe oublié ?
             </a>
           </FieldDescription> */}
         </Field>
         {error && <p className="text-sm text-red-500">{error}</p>}
         <Field>
           <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? 'Signing In...' : 'Sign In'}
+            {loading ? 'Connexion en cours...' : 'Se connecter'}
           </Button>
         </Field>
         {/* Optionnel: Séparateur et connexion via des fournisseurs OAuth */}
-        {/* <FieldSeparator>or continue with</FieldSeparator>
+        {/* <FieldSeparator>ou continuer avec</FieldSeparator>
         <Field>
           <Button variant="outline" className="w-full" type="button" disabled={loading}>
             GitHub
           </Button>
         </Field> */}
         <FieldDescription className="text-center">
-          Don&apos;t have an account?{' '}
+          Vous n&apos;avez pas de compte ?{' '}
           <a href="/signup" className="underline underline-offset-4">
-            Sign up
+            S&apos;inscrire
           </a>
         </FieldDescription>
       </FieldGroup>

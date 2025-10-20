@@ -65,18 +65,18 @@ export function SignUpForm({
     >
       <FieldGroup>
         <div className="flex flex-col items-center gap-1 text-center">
-          <h1 className="text-2xl font-bold">Create your account</h1>
+          <h1 className="text-2xl font-bold">Créez votre compte</h1>
           <p className="text-muted-foreground text-sm text-balance">
-            Fill in the form below to create your account
+            Remplissez le formulaire ci-dessous pour créer votre compte
           </p>
         </div>
 
         <Field>
-          <Label htmlFor="name">Full Name</Label>
+          <Label htmlFor="name">Nom complet</Label>
           <Input
             id="name"
             type="text"
-            placeholder="John Doe"
+            placeholder="Jean Dupont"
             value={fullName}
             onChange={(e) => setFullName(e.target.value)}
             disabled={loading}
@@ -88,7 +88,7 @@ export function SignUpForm({
           <Input
             id="email"
             type="email"
-            placeholder="m@example.com"
+            placeholder="nom@exemple.com"
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
@@ -97,7 +97,7 @@ export function SignUpForm({
         </Field>
 
         <Field>
-          <Label htmlFor="password">Password</Label>
+          <Label htmlFor="password">Mot de passe</Label>
           <Input
             id="password"
             type="password"
@@ -106,11 +106,11 @@ export function SignUpForm({
             onChange={(e) => setPwd(e.target.value)}
             disabled={loading}
           />
-          <FieldDescription>Must be at least 6 characters long.</FieldDescription>
+          <FieldDescription>Doit contenir au moins 6 caractères.</FieldDescription>
         </Field>
 
         <Field>
-          <Label htmlFor="confirm-password">Confirm Password</Label>
+          <Label htmlFor="confirm-password">Confirmer le mot de passe</Label>
           <Input
             id="confirm-password"
             type="password"
@@ -126,14 +126,14 @@ export function SignUpForm({
 
         <Field>
           <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? "Creating Account..." : "Create Account"}
+            {loading ? "Création du compte..." : "Créer un compte"}
           </Button>
         </Field>
 
         <FieldDescription className="text-center">
-          Already have an account?{" "}
+          Vous avez déjà un compte ?{" "}
           <a href="/login" className="underline underline-offset-4">
-            Sign in
+            Se connecter
           </a>
         </FieldDescription>
       </FieldGroup>
