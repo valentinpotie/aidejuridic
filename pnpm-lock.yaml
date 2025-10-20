@@ -39,7 +39,7 @@ importers:
         specifier: ^0.10.0
         version: 0.10.0(@supabase/supabase-js@2.75.1)
       '@supabase/ssr':
-        specifier: ^0.7.0
+        specifier: 0.7.0
         version: 0.7.0(@supabase/supabase-js@2.75.1)
       '@supabase/supabase-js':
         specifier: ^2.75.1

@@ -1,5 +1,5 @@
 // aidejuridic-forgemini/app/api/create-session/route.ts
-import { type CookieOptions, createServerClient } from '@supabase/ssr';
+import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
 import { WORKFLOW_ID } from "@/lib/config";
@@ -12,6 +12,16 @@ interface CreateSessionRequestBody {
   chatkit_configuration?: { file_upload?: { enabled?: boolean } };
 }
 
+type CookieOptions = {
+  domain?: string;
+  expires?: Date;
+  httpOnly?: boolean;
+  maxAge?: number;
+  path?: string;
+  sameSite?: 'lax' | 'strict' | 'none';
+  secure?: boolean;
+};
+
 const DEFAULT_CHATKIT_BASE = "https://api.openai.com";
 
 export async function POST(request: Request): Promise<Response> {
@@ -23,21 +33,13 @@ export async function POST(request: Request): Promise<Response> {
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookies: {
-        get(name: string) {
-          return cookieStore.get(name)?.value ?? '';
+        async getAll() {
+          return (await cookies()).getAll();
         },
-        set(name: string, value: string, options?: CookieOptions) {
-          try {
-            cookieStore.set({ name, value, ...(options ?? {}) });
-          } catch (error) {
-            console.error("(set cookie edge):", error);
-          }
-        },
-        remove(name: string, options?: CookieOptions) {
-          try {
-            cookieStore.set({ name, value: '', expires: new Date(0), ...(options ?? {}) });
-          } catch (error) {
-            console.error("(remove cookie edge):", error);
+        async setAll(cookiesToSet) {
+          const cookieStore = await cookies();
+          for (const { name, value, options } of cookiesToSet) {
+            cookieStore.set(name, value, options);
           }
         },
       },
